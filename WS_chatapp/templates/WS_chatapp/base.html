@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MultiWS Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4a6cf7;
+      --secondary-color: #6c757d;
+      --success-color: #28a745;
+      --info-color: #17a2b8;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7fb;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    nav {
+      background-color: white;
+      box-shadow: var(--box-shadow);
+      padding: 15px 0;
+    }
+    
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: var(--secondary-color);
+      font-weight: 500;
+      padding: 8px 15px;
+      border-radius: var(--border-radius);
+      transition: all 0.3s ease;
+    }
+    
+    .nav-links a:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    hr {
+      border: none;
+      height: 1px;
+      background-color: #eee;
+      margin: 0;
+    }
+    
+    .chat {
+      border: 1px solid #e1e5eb;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      height: 60vh;
+      overflow-y: auto;
+      background-color: white;
+      box-shadow: var(--box-shadow);
+    }
+    
+    .msg.user {
+      text-align: right;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    .msg.bot {
+      text-align: left;
+      color: var(--success-color);
+      margin-bottom: 10px;
+    }
+    
+    .system {
+      color: var(--secondary-color);
+      font-size: 0.9em;
+      text-align: center;
+      margin: 10px 0;
+      padding: 5px;
+      background-color: #f1f3f7;
+      border-radius: 4px;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      background-color: #3a5bd9;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-content">
+        <div class="logo">
+          <i class="fas fa-comments"></i> MultiWS Chat
+        </div>
+        <div class="nav-links">
+          {% if user.is_authenticated %}
+            <span><i class="fas fa-user"></i> {{ user.username }}</span>
+            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="{% url 'signup' %}"><i class="fas fa-user-plus"></i> Signup</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  <hr/>
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

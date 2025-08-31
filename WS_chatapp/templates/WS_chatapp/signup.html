@@ -1,0 +1,44 @@
+{% extends "WS_chatapp/base.html" %}
+{% block content %}
+<div style="max-width: 450px; margin: 50px auto; background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+    <h2 style="margin: 0; color: var(--dark-color);">Create an Account</h2>
+    <p style="color: var(--secondary-color); margin-top: 10px;">Join us and start chatting today</p>
+  </div>
+  
+  <form method="post" style="margin-top: 20px;">
+    {% csrf_token %}
+    <div class="form-group">
+      <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+        <i class="fas fa-user"></i> Username:
+      </label>
+      <input name="username" class="form-control" required/>
+    </div>
+    
+    <div class="form-group">
+      <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+        <i class="fas fa-envelope"></i> Email:
+      </label>
+      <input name="email" class="form-control"/>
+    </div>
+    
+    <div class="form-group">
+      <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+        <i class="fas fa-lock"></i> Password:
+      </label>
+      <input type="password" name="password" class="form-control" required/>
+    </div>
+    
+    <div style="margin-top: 25px;">
+      <button type="submit" class="btn" style="width: 100%;">
+        <i class="fas fa-user-plus"></i> Signup
+      </button>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px; color: var(--secondary-color);">
+      Already have an account? <a href="{% url 'login' %}" style="color: var(--primary-color); text-decoration: none;">Login</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

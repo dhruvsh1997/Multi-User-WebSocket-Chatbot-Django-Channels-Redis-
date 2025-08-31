@@ -1,0 +1,186 @@
+{% extends "WS_chatapp/base.html" %}
+{% block content %}
+<div style="margin-top: 30px;">
+  <div style="display: flex; align-items: center; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: var(--dark-color);">Chat with GPT-5-mini</h2>
+    <span style="margin-left: 15px; padding: 5px 10px; background-color: #e3f2fd; color: var(--primary-color); border-radius: 20px; font-size: 0.8rem;">
+      <i class="fas fa-circle" style="color: var(--success-color); font-size: 0.7rem;"></i> Online
+    </span>
+  </div>
+  
+  <div id="chat" class="chat"></div>
+  
+  <form id="msgform" style="margin-top: 20px; display: flex;">
+    <input type="text" id="message" placeholder="Type a message..." class="form-control" style="width: calc(100% - 120px); margin-right: 10px;" autocomplete="off"/>
+    <button type="submit" class="btn">
+      <i class="fas fa-paper-plane"></i> Send
+    </button>
+  </form>
+</div>
+
+<style>
+  /* Loader animation styles */
+  .typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 12px 15px;
+    border-radius: 18px;
+    max-width: 80%;
+    margin-bottom: 10px;
+  }
+  
+  .typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background-color: #2e7d32;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px;
+    animation: typing 1.4s infinite;
+  }
+  
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.7;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  (function(){
+    const chatEl = document.getElementById('chat');
+    let currentLoader = null;
+    
+    function showTypingIndicator() {
+      // Remove any existing loader
+      if (currentLoader) {
+        chatEl.removeChild(currentLoader);
+      }
+      
+      const loaderContainer = document.createElement('div');
+      loaderContainer.style.textAlign = 'left';
+      loaderContainer.style.marginBottom = '10px';
+      
+      const loader = document.createElement('div');
+      loader.className = 'typing-indicator';
+      loader.innerHTML = `
+        <span></span>
+        <span></span>
+        <span></span>
+      `;
+      
+      loaderContainer.appendChild(loader);
+      chatEl.appendChild(loaderContainer);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      
+      currentLoader = loaderContainer;
+      return currentLoader;
+    }
+    
+    function hideTypingIndicator() {
+      if (currentLoader) {
+        chatEl.removeChild(currentLoader);
+        currentLoader = null;
+      }
+    }
+    
+    function addMessage(kind, text) {
+      // Hide loader if it's showing
+      if (kind === 'bot') {
+        hideTypingIndicator();
+      }
+      
+      const div = document.createElement('div');
+      div.className = 'msg ' + (kind === 'user' ? 'user' : kind === 'bot' ? 'bot' : 'system');
+      
+      // Add message bubbles for better visual distinction
+      if (kind === 'user' || kind === 'bot') {
+        const bubble = document.createElement('div');
+        bubble.style.padding = '12px 15px';
+        bubble.style.borderRadius = '18px';
+        bubble.style.display = 'inline-block';
+        bubble.style.maxWidth = '80%';
+        bubble.style.marginBottom = '10px';
+        
+        if (kind === 'user') {
+          bubble.style.backgroundColor = '#e3f2fd';
+          bubble.style.color = '#0d47a1';
+          div.style.textAlign = 'right';
+        } else {
+          bubble.style.backgroundColor = '#e8f5e9';
+          bubble.style.color = '#2e7d32';
+          div.style.textAlign = 'left';
+        }
+        
+        bubble.textContent = text;
+        div.appendChild(bubble);
+      } else {
+        div.textContent = text;
+      }
+      
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+    
+    // Build ws URL (ws or wss depending on page)
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = `${protocol}://${window.location.host}/ws/chat/`;
+    const socket = new WebSocket(wsUrl);
+    
+    socket.onopen = () => addMessage('system','<i class="fas fa-check-circle"></i> WebSocket connected.');
+    socket.onclose = () => {
+      hideTypingIndicator(); // Hide loader if connection closes
+      addMessage('system','<i class="fas fa-exclamation-circle"></i> WebSocket disconnected.');
+    };
+    socket.onerror = (e) => {
+      hideTypingIndicator(); // Hide loader on error
+      addMessage('system','<i class="fas fa-times-circle"></i> WebSocket error.');
+    };
+    
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if(data.type === 'user') {
+          addMessage('user', data.message);
+        } else if (data.type === 'bot') {
+          addMessage('bot', data.message);
+        } else if (data.type === 'broadcast') {
+          addMessage('system', '<i class="fas fa-bullhorn"></i> [BROADCAST] ' + data.message);
+        } else if (data.type === 'system') {
+          addMessage('system', data.message);
+        }
+      } catch(e) {
+        hideTypingIndicator(); // Hide loader on error
+        addMessage('system','<i class="fas fa-exclamation-triangle"></i> Invalid message: ' + event.data);
+      }
+    };
+    
+    document.getElementById('msgform').onsubmit = function(e){
+      e.preventDefault();
+      const val = document.getElementById('message').value;
+      if(!val) return;
+      
+      // Show typing indicator when user sends a message
+      showTypingIndicator();
+      
+      socket.send(JSON.stringify({message: val}));
+      document.getElementById('message').value = '';
+    };
+  })();
+</script>
+{% endblock %}
