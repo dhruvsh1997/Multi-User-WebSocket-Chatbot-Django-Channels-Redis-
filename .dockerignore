@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+env/
+venv/
+.env
+envMultiWSC/
+
+# Static & media (will be collected in container)
+static/
+media/
+
+# Logs
+*.log
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
