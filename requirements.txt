@@ -5,4 +5,4 @@ channels_redis
 redis>=4.0
 openai>=1.0   # or the SDK that matches your platform; adjust if you use the official 'openai' or 'OpenAI' client package
 python-dotenv
-numpy
+pylint
