@@ -19,7 +19,6 @@ media/
 
 # IDEs / Editors
 .vscode/
-.idea/
 *.swp
 
 # Git
