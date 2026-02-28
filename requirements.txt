@@ -7,3 +7,4 @@ openai>=1.0   # or the SDK that matches your platform; adjust if you use the off
 python-dotenv
 pylint
 numpy
+scipy
